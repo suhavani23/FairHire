@@ -1,0 +1,24 @@
+{
+  "_help": "Patterns and thresholds for pay and role transparency. penalties are subtracted from 100.",
+  "salaryListedPattern": "(?:₹|\\brs\\.?|\\binr\\b|\\bctc\\b|\\bstipend\\b|\\bsalary\\b|\\bpay\\b)\\s*(?:of|:|-|is)?\\s*(?:rs\\.?\\s*|₹\\s*)?\\d[\\d,\\.]*|\\b\\d[\\d,\\.]*\\s*(?:lpa|lakhs?\\s*(?:per|pa|p\\.a)|k\\s*(?:per|/)\\s*(?:month|year))",
+  "salaryNotListedPattern": "^\\s*(?:|not\\s+disclosed|undisclosed|competitive|best\\s+in\\s+(?:the\\s+)?industry|as\\s+per\\s+(?:industry|company)\\s+norms?|negotiable|confidential|n/?a|-+)\\s*$",
+  "unpaidPattern": "\\bunpaid\\b",
+  "vagueRolePatterns": [
+    "\\bother\\s+duties\\s+as\\s+(?:assigned|required)\\b",
+    "\\bany\\s+other\\s+(?:work|tasks?|duties)\\b",
+    "\\bmiscellaneous\\s+(?:tasks?|duties)\\b",
+    "\\bwill\\s+be\\s+discussed\\s+(?:in|during)\\s+(?:the\\s+)?interview\\b"
+  ],
+  "mandatorySkillsLinePattern": "(?:must\\s+have|mandatory|required\\s+skills?|requirements?)\\b[^\\n]*",
+  "maxMandatorySkills": 10,
+  "entryLevelPattern": "\\b(?:intern(?:ship)?|fresher|entry[- ]level|junior|trainee|graduate\\s+engineer)\\b",
+  "experiencePattern": "(\\d{1,2})\\s*\\+?\\s*(?:-\\s*\\d{1,2}\\s*)?(?:years?|yrs?)[^.\\n]{0,20}experience|experience[^.\\n]{0,20}?(\\d{1,2})\\s*\\+?\\s*(?:years?|yrs?)",
+  "inflatedYears": 3,
+  "minDescriptionChars": 300,
+  "penalties": {
+    "noSalary": 30,
+    "redFlag": 12,
+    "missingSection": 5,
+    "shortDescription": 10
+  }
+}

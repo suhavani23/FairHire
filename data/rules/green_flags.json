@@ -1,0 +1,35 @@
+{
+  "_help": "Positive signals. inclusivity:true groups also add a small inclusivity bonus. missingLabel is shown as 'missing' when the group is absent (null = never reported as missing).",
+  "inclusivityBonusEach": 5,
+  "maxInclusivityBonus": 10,
+  "groups": [
+    {
+      "id": "parental_leave",
+      "label": "Parental leave mentioned",
+      "missingLabel": "parental leave",
+      "inclusivity": true,
+      "pattern": "\\b(?:parental|maternity|paternity|adoption)\\s+leave\\b|\\bchild\\s?care\\b|\\bcreche\\b"
+    },
+    {
+      "id": "flexible_work",
+      "label": "Flexible or hybrid work",
+      "missingLabel": "flexibility (remote or hybrid)",
+      "inclusivity": true,
+      "pattern": "\\b(?:remote|hybrid|flexible\\s+(?:hours|working|work|timings?)|work\\s+from\\s+home|wfh)\\b"
+    },
+    {
+      "id": "equal_opportunity",
+      "label": "Equal opportunity or POSH statement",
+      "missingLabel": "equal opportunity statement",
+      "inclusivity": true,
+      "pattern": "\\bequal\\s+opportunity\\b|\\bdiversity\\b|\\binclusi(?:ve|on)\\b|\\bposh\\b|\\bprevention\\s+of\\s+sexual\\s+harassment\\b|\\bwomen\\s+(?:are\\s+)?(?:encouraged|welcome)\\b"
+    },
+    {
+      "id": "returnee_friendly",
+      "label": "Career-break returners welcome",
+      "missingLabel": null,
+      "inclusivity": true,
+      "pattern": "\\breturn(?:ee|ers?|ing)\\b[^.\\n]{0,30}\\b(?:career\\s+break|work|workforce)\\b|\\bcareer\\s+break\\b|\\bre-?enter\\s+the\\s+workforce\\b"
+    }
+  ]
+}

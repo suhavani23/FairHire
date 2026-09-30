@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FairhireAnalysisContract",
+  "description": "Strict contract for POST /analyze response between Fairhire backend and Chrome extension",
+  "type": "object",
+  "required": [
+    "trustScore",
+    "verdict",
+    "reasons",
+    "scam",
+    "inclusivity",
+    "transparency",
+    "company",
+    "history"
+  ],
+  "properties": {
+    "trustScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Composite score calculated as 0.4*(100-scamRisk) + 0.3*inclusivity + 0.3*transparency, capped at 30 if scam risk is high"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["Looks OK", "Apply with caution", "Likely scam"]
+    },
+    "reasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 4,
+      "description": "2-3 short summary bullets explaining the verdict"
+    },
+    "scam": {
+      "type": "object",
+      "required": ["risk", "score", "signals", "domainChecks"],
+      "properties": {
+        "risk": { "type": "string", "enum": ["low", "medium", "high"] },
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["phrase", "why"],
+            "properties": {
+              "phrase": { "type": "string" },
+              "why": { "type": "string" }
+            }
+          }
+        },
+        "domainChecks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["domain", "note"],
+            "properties": {
+              "domain": { "type": "string" },
+              "ageDays": { "type": ["integer", "null"] },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "inclusivity": {
+      "type": "object",
+      "required": ["score", "flags"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["phrase", "type", "severity", "why", "rewrite"],
+            "properties": {
+              "phrase": { "type": "string" },
+              "type": { "type": "string", "enum": ["gendered", "age", "availability", "other"] },
+              "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+              "why": { "type": "string" },
+              "rewrite": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "transparency": {
+      "type": "object",
+      "required": ["score", "salaryListed", "redFlags", "greenFlags", "missing"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "salaryListed": { "type": "boolean" },
+        "redFlags": { "type": "array", "items": { "type": "string" } },
+        "greenFlags": { "type": "array", "items": { "type": "string" } },
+        "missing": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "company": {
+      "type": "object",
+      "required": ["name", "tier", "type", "facts", "news", "reviewLinks", "community"],
+      "properties": {
+        "name": { "type": "string" },
+        "tier": { "type": "integer", "enum": [1, 2, 3] },
+        "type": { "type": "string", "enum": ["MNC", "Startup", "Mid-size", "Unknown"] },
+        "facts": {
+          "type": "object",
+          "properties": {
+            "womenWorkforcePct": { "$ref": "#/definitions/FactItem" },
+            "womenTurnoverPct": { "$ref": "#/definitions/FactItem" },
+            "menTurnoverPct": { "$ref": "#/definitions/FactItem" },
+            "medianPayRatioWomenToMen": { "$ref": "#/definitions/FactItem" },
+            "womenInLeadershipPct": { "$ref": "#/definitions/FactItem" },
+            "poshComplaintsFiled": { "$ref": "#/definitions/FactItem" },
+            "poshComplaintsResolved": { "$ref": "#/definitions/FactItem" },
+            "poshComplaintsPending": { "$ref": "#/definitions/FactItem" },
+            "poshPolicyDisclosed": { "$ref": "#/definitions/FactItem" }
+          }
+        },
+        "news": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["headline", "outlet", "date", "url"],
+            "properties": {
+              "headline": { "type": "string" },
+              "outlet": { "type": "string" },
+              "date": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        },
+        "reviewLinks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "url"],
+            "properties": {
+              "label": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        },
+        "community": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "rating", "count", "tags", "isSeed"],
+            "properties": {
+              "role": { "type": "string" },
+              "rating": { "type": ["number", "null"] },
+              "count": { "type": "integer" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "isSeed": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "required": ["id", "timestamp"],
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" }
+      }
+    }
+  },
+  "definitions": {
+    "FactItem": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": { "type": ["number", "string", "boolean", "null"] },
+        "year": { "type": ["string", "integer", "null"] },
+        "source": { "type": ["string", "null"] },
+        "sourceUrl": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

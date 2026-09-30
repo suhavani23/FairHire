@@ -1,0 +1,160 @@
+{
+  "trustScore": 78,
+  "verdict": "Looks OK",
+  "reasons": [
+    "Clean domain history and transparent official company email",
+    "Clear salary disclosure with hybrid flexibility perks",
+    "Minor gender-coded phrasing ('rockstar engineer') detected in requirements"
+  ],
+  "scam": {
+    "risk": "low",
+    "score": 10,
+    "signals": [],
+    "domainChecks": [
+      {
+        "domain": "tcs.com",
+        "ageDays": 10240,
+        "note": "Established corporate domain (verified > 25 years old)"
+      }
+    ]
+  },
+  "inclusivity": {
+    "score": 75,
+    "flags": [
+      {
+        "phrase": "rockstar developer",
+        "type": "gendered",
+        "severity": "medium",
+        "why": "Masculine-coded jargon that can discourage qualified women and diverse applicants from applying.",
+        "rewrite": "highly skilled software engineer"
+      },
+      {
+        "phrase": "work late nights when deadlines hit",
+        "type": "availability",
+        "severity": "medium",
+        "why": "Implies unstructured overtime and poor work-life boundaries, impacting caregivers.",
+        "rewrite": "flexible team player capable of managing project timelines"
+      }
+    ]
+  },
+  "transparency": {
+    "score": 85,
+    "salaryListed": true,
+    "redFlags": [],
+    "greenFlags": [
+      "Explicit salary range provided",
+      "Equal opportunity employer commitment stated",
+      "POSH compliance noted",
+      "Flexible hybrid work schedule"
+    ],
+    "missing": [
+      "Specific parental leave duration"
+    ]
+  },
+  "company": {
+    "name": "Tata Consultancy Services",
+    "tier": 1,
+    "type": "MNC",
+    "facts": {
+      "womenWorkforcePct": {
+        "value": 35.6,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (p. 42)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "womenTurnoverPct": {
+        "value": 12.8,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (p. 45)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "menTurnoverPct": {
+        "value": 12.4,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (p. 45)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "medianPayRatioWomenToMen": {
+        "value": 0.96,
+        "year": "FY24",
+        "source": "TCS Annual Report FY24",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "womenInLeadershipPct": {
+        "value": 15.2,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (Principle 3)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "poshComplaintsFiled": {
+        "value": 110,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (Principle 5)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "poshComplaintsResolved": {
+        "value": 102,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (Principle 5)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "poshComplaintsPending": {
+        "value": 8,
+        "year": "FY24",
+        "source": "TCS BRSR FY24 (Principle 5)",
+        "sourceUrl": "https://www.tcs.com/investor-relations"
+      },
+      "poshPolicyDisclosed": {
+        "value": true,
+        "year": "FY24",
+        "source": "TCS Governance Policies",
+        "sourceUrl": "https://www.tcs.com"
+      }
+    },
+    "news": [
+      {
+        "headline": "TCS recognized in Bloomberg Gender-Equality Index for inclusive workplace policies",
+        "outlet": "Economic Times",
+        "date": "2024-05-12",
+        "url": "https://economictimes.indiatimes.com"
+      }
+    ],
+    "reviewLinks": [
+      {
+        "label": "AmbitionBox Reviews",
+        "url": "https://www.google.com/search?q=Tata+Consultancy+Services+reviews+ambitionbox"
+      },
+      {
+        "label": "Glassdoor Reviews",
+        "url": "https://www.google.com/search?q=Tata+Consultancy+Services+reviews+glassdoor"
+      }
+    ],
+    "community": [
+      {
+        "role": "Recruiter",
+        "rating": 4.2,
+        "count": 18,
+        "tags": ["Responds fast", "Transparent", "Clear communication"],
+        "isSeed": true
+      },
+      {
+        "role": "Hiring manager",
+        "rating": 3.9,
+        "count": 12,
+        "tags": ["Respectful", "Fair credit"],
+        "isSeed": true
+      },
+      {
+        "role": "Team lead",
+        "rating": 3.7,
+        "count": 9,
+        "tags": ["Flexible", "Tight deadlines"],
+        "isSeed": true
+      }
+    ]
+  },
+  "history": {
+    "id": "demo-tcs-001",
+    "timestamp": "2026-09-30T09:20:00Z"
+  }
+}

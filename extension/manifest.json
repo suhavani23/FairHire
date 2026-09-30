@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Fairhire: Job Trust & Safety Co-pilot",
+  "version": "1.0.0",
+  "description": "Checks job listings for scam signals, inclusivity, pay transparency, and verified company safety data on Naukri, Internshala, and LinkedIn.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.naukri.com/*",
+    "*://*.internshala.com/*",
+    "*://*.linkedin.com/*",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.naukri.com/*",
+        "*://*.internshala.com/*",
+        "*://*.linkedin.com/*",
+        "*://localhost/*",
+        "*://127.0.0.1/*",
+        "file://*/*"
+      ],
+      "js": [
+        "selectors.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Fairhire - Click on a job page to check trust"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "panel.html",
+        "panel.css",
+        "icons/*",
+        "data/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

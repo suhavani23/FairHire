@@ -1,0 +1,7 @@
+/* content.css - Injected into host page document */
+/* Minimal outer wrapper - all components live isolated inside Shadow DOM */
+#fairhire-root {
+  all: initial;
+  position: static;
+  z-index: 2147483647; /* Maximum z-index above job site overlays */
+}

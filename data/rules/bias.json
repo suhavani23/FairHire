@@ -1,0 +1,66 @@
+{
+  "_help": "Each rule: id, pattern (regex), type (gendered|age|availability|other), severity (high|medium|low), why, rewrite. Penalties are set in severityPenalty.",
+  "severityPenalty": {
+    "high": 15,
+    "medium": 8,
+    "low": 4
+  },
+  "rules": [
+    {
+      "id": "masculine_words",
+      "type": "gendered",
+      "severity": "medium",
+      "pattern": "\\b(?:rock\\s?stars?|ninjas?|gurus?|dominant|dominate|crush\\s+it|hard-?charging|alpha)\\b",
+      "why": "Masculine-coded wording can discourage women and others from applying.",
+      "rewrite": "Say 'skilled professional' or describe the actual skill needed."
+    },
+    {
+      "id": "aggressive_person",
+      "type": "gendered",
+      "severity": "medium",
+      "pattern": "\\baggressive\\b(?!\\s+(?:growth|targets?|timelines?|pricing|goals?|roadmap|deadlines?))",
+      "why": "'Aggressive' describing a person is masculine-coded and can put off many candidates.",
+      "rewrite": "Say 'proactive' or 'results-driven'."
+    },
+    {
+      "id": "age_hint",
+      "type": "age",
+      "severity": "high",
+      "pattern": "\\byoung\\s+and\\s+energetic|\\benergetic\\s+and\\s+young|\\byoung(?:er)?\\s+(?:candidates?|graduates?|blood|team)|\\bdigital\\s+natives?\\b|\\bage\\s+(?:limit|below|between|not\\s+more)\\b|\\b(?:2\\d|3\\d)\\s*(?:-|to)\\s*(?:2\\d|3\\d)\\s*(?:years?|yrs?)\\s*(?:old|of\\s+age)",
+      "why": "Age hints exclude experienced candidates and may be discriminatory.",
+      "rewrite": "Describe the skills or experience needed instead of an age or generation."
+    },
+    {
+      "id": "recent_grad",
+      "type": "age",
+      "severity": "low",
+      "pattern": "\\brecent\\s+graduates?\\s+only\\b|\\bfreshers?\\s+only\\b",
+      "why": "Restricting to recent graduates can exclude career changers and returners.",
+      "rewrite": "Say 'entry-level' and welcome career changers and returners."
+    },
+    {
+      "id": "late_hours",
+      "type": "availability",
+      "severity": "high",
+      "pattern": "\\b24\\s?[x/*]\\s?7\\b|\\blate\\s+nights?\\b|\\b(?:work|working)\\s+late\\b|\\bround\\s+the\\s+clock\\b|\\bany\\s+time\\s+of\\s+the\\s+day\\b|\\bno\\s+fixed\\s+(?:working\\s+)?hours\\b|\\blong\\s+hours\\b|\\bflexible\\s+to\\s+work\\s+(?:nights?|late|weekends?)\\b",
+      "why": "Extreme or unpredictable hours disadvantage caregivers and raise safety concerns for night travel.",
+      "rewrite": "State the expected working hours and how on-call or overtime is handled and compensated."
+    },
+    {
+      "id": "gender_marital",
+      "type": "gendered",
+      "severity": "high",
+      "pattern": "\\b(?:girls?|boys?|females?\\s+only|males?\\s+only|unmarried|single\\s+(?:candidates?|girls?|only)|married\\s+(?:women|females?)|only\\s+(?:male|female|men|women)|good[- ]looking|pleasing\\s+personality|presentable\\s+(?:girl|female|lady))\\b",
+      "why": "Gender, marital status or looks should not decide who can apply.",
+      "rewrite": "Say 'candidates' and describe only the skills and duties of the role."
+    },
+    {
+      "id": "career_gap",
+      "type": "other",
+      "severity": "medium",
+      "pattern": "\\bno\\s+(?:career\\s+)?gaps?\\b|\\bno\\s+gaps?\\s+in\\s+(?:education|career)\\b|\\bgood\\s+family\\s+background\\b",
+      "why": "Rules against career gaps or about family background exclude returners, caregivers and many others.",
+      "rewrite": "Welcome candidates returning from a career break and assess skills only."
+    }
+  ]
+}
