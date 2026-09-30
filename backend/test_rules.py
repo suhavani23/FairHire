@@ -54,6 +54,13 @@ class Rules(unittest.TestCase):
         self.assertIn("Parental leave mentioned", out["transparency"]["greenFlags"])
         self.assertEqual(out["inclusivity"]["flags"], [])
 
+    def test_heavily_biased_listing_is_not_looks_ok(self):
+        listing = dict(BIASED, company="Acme Pvt Ltd", salary="INR 6,00,000 per year")
+        out = re_.analyze_rules_only(listing)
+        self.assertEqual(out["scam"]["risk"], "low")
+        self.assertLess(out["inclusivity"]["score"], 60)
+        self.assertEqual(out["verdict"], "Apply with caution")
+
     def test_no_fee_is_not_flagged(self):
         out = re_.analyze_rules({"company": "Acme", "description": "There is no registration fee for candidates."})
         self.assertEqual(out["scam"]["signals"], [])

@@ -10,9 +10,9 @@ Formula (keep docs/SCORING.md in sync with this file):
   trustScore = 0.4*(100 - scamScore) + 0.3*inclusivity + 0.3*transparency
   if scam risk is "high": trustScore is capped at 30
   scam risk:  score < 30 low, < 60 medium, else high
-  verdict:    high scam risk            -> "Likely scam"
-              medium risk or trust < 60 -> "Apply with caution"
-              otherwise                 -> "Looks OK"
+  verdict:    high scam risk                            -> "Likely scam"
+              medium risk, trust < 60 or inclusivity < 60 -> "Apply with caution"
+              otherwise                                 -> "Looks OK"
 
 Adjustments made when merging (all small, all documented here):
   scam:         +10 per NEW signal from LLM or domain checks (max +30), +20 for a very new domain,
@@ -111,10 +111,11 @@ def compute_trust(scam_score, scam_risk, inclusivity, transparency):
     return clamp(trust)
 
 
-def verdict_for(trust, scam_risk):
+def verdict_for(trust, scam_risk, inclusivity=100):
+    """Low inclusivity alone (below 60) also means 'Apply with caution', even when scam risk is low."""
     if scam_risk == "high":
         return "Likely scam"
-    if scam_risk == "medium" or trust < 60:
+    if scam_risk == "medium" or trust < 60 or inclusivity < 60:
         return "Apply with caution"
     return "Looks OK"
 

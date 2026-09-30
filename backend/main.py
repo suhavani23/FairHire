@@ -63,7 +63,7 @@ def get_contract():
             return json.load(f)
     return JSONResponse(status_code=404, content={"error": "Contract schema not found"})
 
-from rules_engine import analyze_rules_only
+from rules_engine import analyze_rules, analyze_rules_only  # analyze_rules_only kept as fallback
 
 # Simple URL/payload cache to prevent duplicate processing
 ANALYSIS_CACHE: dict = {}
@@ -72,7 +72,8 @@ ANALYSIS_CACHE: dict = {}
 async def analyze_job(request: Request):
     """
     Main job trust analysis endpoint.
-    Runs rule layer (and LLM/enrichment in upcoming phases) and returns strict contract JSON.
+    Step 4: rules → LLM (Groq) + RDAP domain checks → merge → score → contract JSON.
+    Fallback chain: pipeline → rules-only → demo JSON. Never crashes the client.
     """
     try:
         body = await request.json()
@@ -101,8 +102,9 @@ async def analyze_job(request: Request):
         return ANALYSIS_CACHE[job_url]
 
     try:
-        # Run Rule Layer analysis (Step 3 core loop)
-        analysis_result = analyze_rules_only(body)
+        # Step 4: rules → LLM + domain checks → merge → score
+        from pipeline import run_analysis
+        analysis_result = run_analysis(body, analyze_rules(body))
 
         # Ensure review deep-links exist if company name is known
         company_obj = analysis_result.get("company", {})
@@ -114,14 +116,20 @@ async def analyze_job(request: Request):
                 {"label": "Glassdoor Reviews", "url": f"https://www.google.com/search?q={clean_q}+reviews+glassdoor"}
             ]
 
-        # Store in cache if URL is valid
         if job_url:
             ANALYSIS_CACHE[job_url] = analysis_result
 
         return analysis_result
     except Exception as e:
-        logger.error(f"Error during job analysis: {e}", exc_info=True)
-        # Fallback to canned demo data on unexpected error to ensure zero client crash
+        logger.error(f"Error during Step 4 analysis: {e}", exc_info=True)
+        # Graceful fallback 1: rule-only result
+        try:
+            fallback = analyze_rules_only(body)
+            logger.info("Returned rule-only fallback due to pipeline error")
+            return fallback
+        except Exception:
+            pass
+        # Graceful fallback 2: canned demo JSON
         if DEMO_ANALYSIS_PATH.exists():
             with open(DEMO_ANALYSIS_PATH, "r", encoding="utf-8") as f:
                 return json.load(f)

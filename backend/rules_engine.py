@@ -218,7 +218,7 @@ def analyze_rules_only(payload):
     trust = compute_trust(scam["score"], scam["risk"], incl["score"], trans["score"])
     return {
         "trustScore": trust,
-        "verdict": verdict_for(trust, scam["risk"]),
+        "verdict": verdict_for(trust, scam["risk"], incl["score"]),
         "reasons": build_reasons(scam, incl, trans),
         "scam": scam, "inclusivity": incl, "transparency": trans,
         "company": {"name": _s(payload.get("company")), "tier": 3, "type": "Unknown",
