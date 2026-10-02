@@ -1,0 +1,11 @@
+# PROJECT_RULES.md
+- Never invent data or numbers. Company values come only from files in data/raw/. If unknown, use null and show "Not enough data yet".
+- Do not scrape Glassdoor, AmbitionBox, LinkedIn or any site. Review sites get Google-search deep links only.
+- Secrets live only in .env (gitignored). Never print or commit keys.
+- data/contract.json is frozen. Do not change the response shape without asking.
+- Every network call has a timeout and a fallback. DEMO_MODE must keep working on every screen.
+- Panel stays in a Shadow DOM. Backend stays FastAPI + SQLite. Extension stays plain JavaScript, no build step.
+- No real person names anywhere. Ratings are role-based with trait tags only, no free text.
+- Edit existing files; do not rewrite or recreate them. Read each file before modifying it.
+- No new dependencies without asking.
+- Do not commit. List exactly which files changed and give me a short test checklist.

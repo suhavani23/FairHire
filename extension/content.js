@@ -42,90 +42,95 @@
 
     <!-- Side Panel (~380px) -->
     <aside id="fairhire-side-panel" aria-label="Fairhire Trust Report Side Panel">
+      
       <!-- Header -->
       <div class="fh-panel-header">
-        <div class="fh-brand-group">
-          <span class="fh-logo-mark">FH</span>
+        <div class="fh-brand-group" id="fh-brand-logo" title="Shift+Click for Debug Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span class="fh-panel-title">Fairhire</span>
         </div>
-        <div class="fh-header-actions">
-          <button class="fh-demo-toggle-btn" id="fh-demo-toggle" title="Toggle Demo Mode (Forces offline canned responses)">DEMO: OFF</button>
-          <button class="fh-icon-btn" id="fh-theme-toggle" title="Toggle Dark/Light Mode">🌓</button>
-          <button class="fh-icon-btn" id="fh-close-btn" title="Close Panel">✕</button>
-        </div>
+        <button class="fh-icon-btn" id="fh-close-btn" title="Close Panel">✕</button>
       </div>
 
-      <!-- Live Backend Status Bar -->
-      <div class="fh-status-bar">
+      <!-- Debug Area (Hidden by default) -->
+      <div class="fh-debug-area" id="fh-debug-area">
+        <button class="fh-demo-toggle-btn" id="fh-demo-toggle">DEMO: OFF</button>
+        <button class="fh-demo-toggle-btn" id="fh-theme-toggle">Dark Mode</button>
         <div class="fh-status-pill">
           <span class="fh-status-dot" id="fh-status-dot"></span>
           <span id="fh-status-text">Checking backend...</span>
+          <span class="fh-mode-badge" id="fh-mode-badge">${siteName.toUpperCase()}</span>
         </div>
-        <span class="fh-mode-badge" id="fh-mode-badge">${siteName.toUpperCase()}</span>
+      </div>
+
+      <!-- Tabs -->
+      <div class="fh-tabs">
+        <div class="fh-tab active" data-target="tab-overview">Overview</div>
+        <div class="fh-tab" data-target="tab-company">Company</div>
+        <div class="fh-tab" data-target="tab-people">People</div>
       </div>
 
       <!-- Scrollable Body -->
       <div class="fh-panel-body" id="fh-panel-body">
-        <!-- 1. Idle Scanner State -->
-        <div class="fh-card fh-card-empty" id="fh-idle-card">
-          <div class="fh-empty-sticker">JOB TRUST SCANNER</div>
-          <h2 class="fh-empty-title">Check This Listing</h2>
-          <p class="fh-empty-desc">
-            Analyze this job for hidden recruitment scam fees, inclusive language bias, salary transparency, and employer signals.
-          </p>
+        
+        <!-- Tab: Overview -->
+        <div class="fh-tab-content active" id="tab-overview">
+          <!-- 1. Idle Scanner State -->
+          <div class="fh-card fh-card-empty" id="fh-idle-card">
+            <h2 class="fh-empty-title">Check This Listing</h2>
+            <p class="fh-empty-desc">
+              Analyze this job for hidden recruitment scam fees, inclusive language bias, salary transparency, and employer signals.
+            </p>
+            <button class="fh-action-btn" id="fh-btn-run-extract">
+              <span>Scan Listing Details</span>
+            </button>
+            <div style="margin-top: 12px; font-size: 11px; color: var(--fh-secondary);">
+              Detected Portal: <b>${siteName}</b><br>
+              <span id="fh-detect-url">${escapeHtml(window.location.href.substring(0, 48))}...</span>
+            </div>
+          </div>
 
-          <button class="fh-action-btn" id="fh-btn-run-extract">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <span>Scan Listing Details</span>
-          </button>
+          <!-- 2. Extraction Results View (Listing Summary) -->
+          <div id="fh-extract-view" style="display: none;"></div>
 
-          <div class="fh-site-detect">
-            <dl>
-              <dt>Detected Portal</dt>
-              <dd>${siteName}</dd>
-              <dt>Current URL</dt>
-              <dd id="fh-detect-url">${escapeHtml(window.location.href.substring(0, 48))}...</dd>
-              <dt>Status</dt>
-              <dd>Ready</dd>
-            </dl>
+          <!-- 3. Loading Skeleton View -->
+          <div id="fh-loading-view" style="display: none;">
+            <div class="fh-skeleton-box">
+              <div style="font-size:12px; font-weight:600;">⚡ Running Trust & Safety Rules...</div>
+              <div class="fh-skeleton-line" style="width: 80%;"></div>
+              <div class="fh-skeleton-line" style="width: 100%;"></div>
+              <div class="fh-skeleton-line" style="width: 60%;"></div>
+              <div class="fh-skeleton-line" style="width: 90%;"></div>
+            </div>
+          </div>
+
+          <!-- 4. Friendly Error View -->
+          <div id="fh-error-view" style="display: none;"></div>
+
+          <!-- 5. Full Trust Report View -->
+          <div id="fh-report-view" style="display: none;"></div>
+        </div>
+
+        <!-- Tab: Company -->
+        <div class="fh-tab-content" id="tab-company">
+          <div class="fh-card fh-card-empty">
+            <p class="fh-empty-desc">Company details will appear here.</p>
           </div>
         </div>
 
-        <!-- 2. Extraction Results View (Listing Summary) -->
-        <div id="fh-extract-view" style="display: none;"></div>
-
-        <!-- 3. Loading Skeleton View -->
-        <div id="fh-loading-view" style="display: none;">
-          <div class="fh-skeleton-box">
-            <div style="font-family:var(--fh-font-heading); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-              ⚡ Running Trust & Safety Rules...
-            </div>
-            <div class="fh-skeleton-score">
-              <span style="font-family:var(--fh-font-heading); font-weight:800; font-size:13px; text-transform:uppercase;">
-                Evaluating Contract Rules
-              </span>
-              <span style="font-size:11px; font-weight:600;">Scam · Inclusivity · Transparency</span>
-            </div>
-            <div class="fh-skeleton-line" style="width: 80%;"></div>
-            <div class="fh-skeleton-line" style="width: 100%;"></div>
-            <div class="fh-skeleton-line" style="width: 60%;"></div>
-            <div class="fh-skeleton-line" style="width: 90%;"></div>
+        <!-- Tab: People -->
+        <div class="fh-tab-content" id="tab-people">
+          <div class="fh-card fh-card-empty">
+            <p class="fh-empty-desc">People details will appear here.</p>
           </div>
         </div>
 
-        <!-- 4. Friendly Error View -->
-        <div id="fh-error-view" style="display: none;"></div>
-
-        <!-- 5. Full Trust Report View -->
-        <div id="fh-report-view" style="display: none;"></div>
       </div>
 
-      <!-- Footer -->
+      <!-- Sticky Footer -->
       <div class="fh-panel-footer">
-        Signals, not verdicts. Based on public disclosures and community input.
+        <button class="fh-pill-btn outlined" id="fh-footer-company-btn">View company details</button>
+        <button class="fh-pill-btn outlined" id="fh-footer-reviews-btn">Open reviews</button>
       </div>
     </aside>
   `;
@@ -144,6 +149,40 @@
   const loadingView = shadow.getElementById("fh-loading-view");
   const errorView = shadow.getElementById("fh-error-view");
   const reportView = shadow.getElementById("fh-report-view");
+
+  const brandLogo = shadow.getElementById("fh-brand-logo");
+  const debugArea = shadow.getElementById("fh-debug-area");
+  const tabs = shadow.querySelectorAll(".fh-tab");
+  const tabContents = shadow.querySelectorAll(".fh-tab-content");
+  const footerCompanyBtn = shadow.getElementById("fh-footer-company-btn");
+  const footerReviewsBtn = shadow.getElementById("fh-footer-reviews-btn");
+
+  brandLogo.addEventListener("click", (e) => {
+    if (e.shiftKey) {
+      debugArea.classList.toggle("show");
+    }
+  });
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tabContents.forEach(c => c.classList.remove("active"));
+      tab.classList.add("active");
+      shadow.getElementById(tab.dataset.target).classList.add("active");
+    });
+  });
+
+  footerCompanyBtn.addEventListener("click", () => {
+    const companyTab = shadow.querySelector('.fh-tab[data-target="tab-company"]');
+    if(companyTab) companyTab.click();
+  });
+
+  footerReviewsBtn.addEventListener("click", () => {
+    const compName = currentExtractedData ? currentExtractedData.company : "Company";
+    const encodedComp = encodeURIComponent(compName);
+    window.open(`https://www.google.com/search?q=${encodedComp}+reviews+ambitionbox`, '_blank');
+    window.open(`https://www.google.com/search?q=${encodedComp}+reviews+glassdoor`, '_blank');
+  });
 
   let currentExtractedData = null;
   let currentAnalysisData = null;
@@ -524,6 +563,7 @@
    */
   function renderTrustReport(data, payload, source) {
     showView("report");
+    footerCompanyBtn.classList.remove("outlined");
 
     const verdict = data.verdict || "Apply with caution";
     let verdictClass = "verdict-caution";
