@@ -43,10 +43,10 @@ def run_analysis(payload, rule_result):
         llm = None
 
     scam, incl, trans = merge_results(rule_result, llm, domain)
-    trust = compute_trust(scam["score"], scam["risk"], incl["score"], trans["score"])
+    trust = compute_trust(scam["score"], scam["risk"], incl["score"], trans["score"], signals=scam["signals"])
     result = {
         "trustScore": trust,
-        "verdict": verdict_for(trust, scam["risk"], incl["score"]),
+        "verdict": verdict_for(trust, scam["risk"], incl["score"], trans["score"], signals=scam["signals"]),
         "reasons": build_reasons(scam, incl, trans, (llm or {}).get("reasons")),
         "scam": scam,
         "inclusivity": incl,
@@ -54,6 +54,7 @@ def run_analysis(payload, rule_result):
         "company": {"name": payload.get("company") or "", "tier": 3, "type": "Unknown",
                     "facts": {}, "news": [], "reviewLinks": [], "community": []},
         "history": _history(),
+        "analysisSource": "ai" if llm else "rules_only",
     }
     if url:
         _CACHE[url] = (time.time(), copy.deepcopy(result))

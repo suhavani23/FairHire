@@ -20,5 +20,7 @@
     "redFlag": 12,
     "missingSection": 5,
     "shortDescription": 10
-  }
+  },
+  "salaryMismatchRatio": 3,
+  "salaryMismatchWhy": "Salary figures in this listing do not match"
 }

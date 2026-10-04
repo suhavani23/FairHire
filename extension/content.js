@@ -704,7 +704,7 @@
           <span class="fh-score-max">/100</span>
         </div>
         <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; opacity:0.85;">
-          Composite Trust Score (${source === "demo_mode" ? "Demo Mode" : "Rules Engine"})
+          Composite Trust Score${source === "demo_mode" ? " (Demo Mode)" : (data.analysisSource !== "ai" ? " (Basic check, AI unavailable)" : "")}
         </div>
 
         <div class="fh-reasons-box">

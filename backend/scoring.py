@@ -8,11 +8,14 @@ Input shapes are the /analyze contract shapes:
 
 Formula (keep docs/SCORING.md in sync with this file):
   trustScore = 0.4*(100 - scamScore) + 0.3*inclusivity + 0.3*transparency
-  if scam risk is "high": trustScore is capped at 30
-  scam risk:  score < 30 low, < 60 medium, else high
-  verdict:    high scam risk                            -> "Likely scam"
-              medium risk, trust < 60 or inclusivity < 60 -> "Apply with caution"
-              otherwise                                 -> "Looks OK"
+  Signal severity caps:
+    worst high signal  -> cap trustScore at 30, verdict "Likely scam"
+    worst medium signal -> cap trustScore at 74, verdict at best "Apply with caution"
+    low signals are informational; do not affect the cap
+  Verdict is driven by the worst factor:
+    any high signal                                         -> "Likely scam"
+    any medium signal OR any dimension < 60                 -> "Apply with caution"
+    no medium/high signals AND all dimensions >= 60         -> "Looks OK"
 
 Adjustments made when merging (all small, all documented here):
   scam:         +10 per NEW signal from LLM or domain checks (max +30), +20 for a very new domain,
@@ -26,6 +29,9 @@ import copy
 
 SEVERITY_PENALTY = {"high": 12, "medium": 7, "low": 3}
 
+# Score caps per worst signal severity present
+_SEVERITY_CAP = {"high": 30, "medium": 74}
+
 
 def clamp(value, low=0, high=100):
     return max(low, min(high, int(round(value))))
@@ -37,6 +43,17 @@ def risk_from_score(score):
 
 def _key(text):
     return (text or "").strip().lower()
+
+
+def worst_signal_severity(signals):
+    """Return the worst severity among a list of signal dicts, or None if empty."""
+    order = {"high": 0, "medium": 1, "low": 2}
+    best = None
+    for sig in signals or []:
+        sev = sig.get("severity", "low")
+        if best is None or order.get(sev, 2) < order.get(best, 2):
+            best = sev
+    return best
 
 
 def merge_results(rule, llm, domain):
@@ -104,38 +121,66 @@ def merge_results(rule, llm, domain):
     return scam, incl, trans
 
 
-def compute_trust(scam_score, scam_risk, inclusivity, transparency):
+def compute_trust(scam_score, scam_risk, inclusivity, transparency, signals=None):
+    """Weighted average capped by the worst signal severity present."""
     trust = 0.4 * (100 - scam_score) + 0.3 * inclusivity + 0.3 * transparency
+    # Legacy cap: high scam risk always caps at 30
     if scam_risk == "high":
         trust = min(trust, 30)
+    # Severity-based cap from individual signal severities
+    worst = worst_signal_severity(signals)
+    if worst in _SEVERITY_CAP:
+        trust = min(trust, _SEVERITY_CAP[worst])
     return clamp(trust)
 
 
-def verdict_for(trust, scam_risk, inclusivity=100):
-    """Low inclusivity alone (below 60) also means 'Apply with caution', even when scam risk is low."""
-    if scam_risk == "high":
+def verdict_for(trust, scam_risk, inclusivity=100, transparency=100, signals=None):
+    """
+    Verdict is driven by the worst factor:
+      any high signal -> "Likely scam"
+      any medium signal OR any dimension < 60 -> "Apply with caution"
+      no medium/high signals AND all dimensions >= 60 -> "Looks OK"
+    """
+    worst = worst_signal_severity(signals)
+    if scam_risk == "high" or worst == "high":
         return "Likely scam"
-    if scam_risk == "medium" or trust < 60 or inclusivity < 60:
+    if scam_risk == "medium" or worst == "medium" or trust < 60 or inclusivity < 60 or transparency < 60:
         return "Apply with caution"
     return "Looks OK"
 
 
 def build_reasons(scam, incl, trans, llm_reasons=None):
-    """2-3 short bullets. Prefer the LLM's wording, else build from the strongest findings."""
+    """2-3 short bullets. The main concern leads. Prefer LLM wording when available."""
     if llm_reasons:
         return llm_reasons[:3]
     reasons = []
-    if scam["signals"]:
-        s = scam["signals"][0]
-        reasons.append("Scam warning: %s" % (s.get("why") or s.get("phrase")))
-    if incl["flags"]:
-        order = {"high": 0, "medium": 1, "low": 2}
+
+    # Lead with the highest-severity scam signal
+    order = {"high": 0, "medium": 1, "low": 2}
+    sorted_signals = sorted(
+        scam.get("signals", []),
+        key=lambda s: order.get(s.get("severity", "low"), 2)
+    )
+    if sorted_signals:
+        s = sorted_signals[0]
+        why = s.get("why") or s.get("phrase") or ""
+        sev = s.get("severity", "low")
+        if sev == "high":
+            reasons.append("%s Verify the company's official careers page before sharing any documents." % why)
+        elif sev == "medium":
+            reasons.append("%s Verify the company's official careers page before sharing documents." % why)
+        else:
+            reasons.append(why)
+
+    if incl.get("flags"):
         f = sorted(incl["flags"], key=lambda x: order.get(x.get("severity"), 1))[0]
         reasons.append("Language concern: %s" % (f.get("why") or f.get("phrase")))
+
     if not trans.get("salaryListed"):
         reasons.append("Salary is not listed.")
-    elif trans["missing"]:
+    elif trans.get("missing"):
         reasons.append("Missing information: %s." % trans["missing"][0])
+
     if not reasons:
         reasons.append("No major warning signs found in the listing text.")
     if len(reasons) < 2:

@@ -15,43 +15,51 @@
     "icloud.com"
   ],
   "freeEmailWeight": 15,
+  "freeEmailSeverity": "medium",
   "freeEmailWhy": "Recruiter contact uses a free email address instead of a company domain.",
   "missingCompanyPattern": "^\\s*(?:|confidential|not\\s+disclosed|undisclosed|n/?a|company\\s+name\\s+(?:withheld|confidential)|leading\\s+(?:company|firm|organi[sz]ation)|reputed\\s+(?:company|firm)|hiring)\\s*$",
   "missingCompanyWeight": 15,
+  "missingCompanySeverity": "medium",
   "missingCompanyWhy": "No real company name is given, so you cannot check who is hiring.",
   "rules": [
     {
       "id": "fee",
+      "severity": "high",
       "weight": 40,
       "why": "Asks you to pay a fee or deposit. Genuine employers do not charge candidates.",
       "pattern": "(?<!\\bno )(?<!\\bzero )\\b(?:registration|security|refundable|joining|training|kit|processing|application|onboarding|uniform|laptop|verification)\\s+(?:fee|fees|deposit|charges?|amount)\\b|\\b(?:pay|deposit|transfer)\\s+(?:rs\\.?\\s*|₹\\s*|inr\\s*)?\\d[\\d,]*\\s*(?:as|for|to|towards)\\b"
     },
     {
       "id": "messaging_only",
+      "severity": "high",
       "weight": 25,
       "why": "Pushes you to WhatsApp or Telegram instead of an official channel.",
       "pattern": "\\b(?:contact|message|msg|apply|send|reach|call|connect)\\b[^.\\n]{0,40}\\b(?:whatsapp|telegram)\\b|\\b(?:whatsapp|telegram)\\b[^.\\n]{0,25}\\b(?:only|number|no\\.|group|channel)\\b|\\bwa\\.me/|\\bt\\.me/"
     },
     {
       "id": "unrealistic_earnings",
+      "severity": "high",
       "weight": 30,
       "why": "Promises unrealistic or guaranteed earnings.",
       "pattern": "\\bearn\\w*[^.\\n]{0,30}?(?:₹|\\b(?:rs\\.?|inr))\\s?\\d[\\d,]*\\s*(?:/|per|a)\\s*(?:day|daily|week|hour)|(?:₹|\\b(?:rs\\.?|inr))\\s?\\d[\\d,]*\\s*(?:/|per)\\s*(?:day|daily|hour)\\b|\\bearn\\w*[^.\\n]{0,20}\\blakhs?\\b[^.\\n]{0,15}\\b(?:month|week|weekly|monthly)\\b|\\bguaranteed\\s+(?:income|salary|earnings?|returns?)\\b"
     },
     {
       "id": "no_interview",
+      "severity": "high",
       "weight": 20,
       "why": "Promises a job without an interview or guarantees selection.",
       "pattern": "\\bno\\s+interview|\\bwithout\\s+(?:an\\s+)?interview|\\binterview[- ]?less|\\bdirect\\s+(?:selection|joining)|\\binstant\\s+(?:selection|offer)|\\bguaranteed\\s+(?:job|placement)|\\b100%\\s+(?:placement|job)\\s+guarantee"
     },
     {
       "id": "urgency",
+      "severity": "medium",
       "weight": 8,
       "why": "Uses urgency pressure to rush you into deciding.",
       "pattern": "\\bonly\\s+\\d+\\s+(?:seats?|slots?|vacanc(?:y|ies)|positions?)\\s+(?:left|remaining)|\\blimited\\s+(?:seats?|slots?|vacanc(?:y|ies))|\\bhurry\\b|\\bapply\\s+(?:immediately|now)\\s+(?:or|before)|\\boffer\\s+(?:valid|ends)\\s+(?:today|tonight)"
     },
     {
       "id": "sensitive_docs",
+      "severity": "high",
       "weight": 20,
       "why": "Asks for sensitive documents or codes before any hiring step.",
       "pattern": "\\b(?:aadhaar|aadhar|pan\\s+card|bank\\s+account|account\\s+number|otp|passport)\\b[^.\\n]{0,30}\\b(?:send|share|provide|submit|upload)\\b|\\b(?:send|share|provide|submit)\\b[^.\\n]{0,30}\\b(?:aadhaar|aadhar|pan\\s+card|bank\\s+details|bank\\s+account|otp)\\b"

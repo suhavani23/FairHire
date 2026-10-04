@@ -24,7 +24,39 @@ log = logging.getLogger("fairhire.rules")
 RULES_DIR = os.getenv("RULES_DIR") or os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "data", "rules")
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@([A-Za-z0-9.\-]+\.[A-Za-z]{2,})")
+_SALARY_VAL_RE = re.compile(
+    r'(?:₹|rs\.?|inr)\s*(\d[\d,]*(?:\.\d+)?)'
+    r'|(\d[\d,]*(?:\.\d+)?)\s*(?:lpa|lakhs?|lacs?)\b'
+    r'|(\d[\d,]*(?:\.\d+)?)\s*(?:crores?|cr)\b',
+    re.I
+)
 _RULES = {}
+
+
+def _parse_salary_val(m):
+    """Return a normalized numeric value (in rupees) from a salary regex match, or None."""
+    raw, lakh, crore = m.groups()
+    try:
+        if raw:
+            return float(raw.replace(',', ''))
+        if lakh:
+            return float(lakh.replace(',', '')) * 100000
+        if crore:
+            return float(crore.replace(',', '')) * 10000000
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
+def _fmt_salary(v):
+    """Format a numeric salary value for display."""
+    if v >= 10000000:
+        return "%.1f Cr" % (v / 10000000)
+    if v >= 100000:
+        return "%.1f Lakhs" % (v / 100000)
+    if v >= 1000:
+        return "%.0fK" % (v / 1000)
+    return "%.0f" % v
 
 
 def _read(name):
@@ -93,19 +125,19 @@ def _scam(title, company, text, contacts):
         match = rule["_re"].search(text)
         if match:
             seen_ids.add(rule["id"])
-            signals.append({"phrase": _phrase(match), "why": rule.get("why", "")})
+            signals.append({"phrase": _phrase(match), "why": rule.get("why", ""), "severity": rule.get("severity", "medium")})
             score += int(rule.get("weight", 10))
 
     free = {d.lower() for d in cfg.get("freeEmailDomains", [])}
     emails = list((contacts or {}).get("emails") or []) + [m.group(0) for m in EMAIL_RE.finditer(text)]
     for email in emails:
         if "@" in str(email) and str(email).split("@")[-1].lower() in free:
-            signals.append({"phrase": str(email), "why": cfg.get("freeEmailWhy", "")})
+            signals.append({"phrase": str(email), "why": cfg.get("freeEmailWhy", ""), "severity": cfg.get("freeEmailSeverity", "medium")})
             score += int(cfg.get("freeEmailWeight", 15))
             break  # count the free-email signal once
 
     if cfg.get("_missingCompany") and cfg["_missingCompany"].match(company or ""):
-        signals.append({"phrase": "(company name missing)", "why": cfg.get("missingCompanyWhy", "")})
+        signals.append({"phrase": "(company name missing)", "why": cfg.get("missingCompanyWhy", ""), "severity": cfg.get("missingCompanySeverity", "medium")})
         score += int(cfg.get("missingCompanyWeight", 15))
 
     score = clamp(score)
@@ -183,6 +215,18 @@ def _transparency(title, salary, text):
         red.append("Listing text is very short, so this check is limited")
         score -= pen.get("shortDescription", 10)
 
+    # Salary consistency check: flag if two figures differ by more than the configured ratio
+    mismatch_ratio = cfg.get("salaryMismatchRatio", 3)
+    sal_text = _s(salary) + " " + text
+    values = [v for m in _SALARY_VAL_RE.finditer(sal_text) for v in [_parse_salary_val(m)] if v and v > 0]
+    if len(values) >= 2 and min(values) > 0:
+        ratio = max(values) / min(values)
+        if ratio > mismatch_ratio:
+            red.append("%s (%s vs %s)" % (
+                cfg.get("salaryMismatchWhy", "Salary figures in this listing do not match"),
+                _fmt_salary(min(values)), _fmt_salary(max(values))))
+            score -= pen.get("redFlag", 12)
+
     found = _green_groups(text)
     found_ids = {g["id"] for g in found}
     green = (["Salary listed"] if listed else []) + [g["label"] for g in found]
@@ -215,10 +259,11 @@ def analyze_rules_only(payload):
     payload = payload or {}
     rules = analyze_rules(payload)
     scam, incl, trans = rules["scam"], rules["inclusivity"], rules["transparency"]
-    trust = compute_trust(scam["score"], scam["risk"], incl["score"], trans["score"])
+    trust = compute_trust(scam["score"], scam["risk"], incl["score"], trans["score"], signals=scam["signals"])
     return {
         "trustScore": trust,
-        "verdict": verdict_for(trust, scam["risk"], incl["score"]),
+        "verdict": verdict_for(trust, scam["risk"], incl["score"], trans["score"], signals=scam["signals"]),
+        "analysisSource": "rules_only",
         "reasons": build_reasons(scam, incl, trans),
         "scam": scam, "inclusivity": incl, "transparency": trans,
         "company": {"name": _s(payload.get("company")), "tier": 3, "type": "Unknown",

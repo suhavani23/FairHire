@@ -88,5 +88,73 @@ class Rules(unittest.TestCase):
         self.assertIsNone(re_._compile("([unclosed", "test"))
 
 
+# ---------- Severity-driven scoring fixtures ----------
+
+FREE_EMAIL_ONLY = {
+    "title": "Marketing Executive",
+    "company": "Acme Corp",
+    "salary": "INR 5,00,000 - 8,00,000",
+    "description": ("Looking for a marketing executive. Good communication skills required. "
+                     "Contact hr.acme@gmail.com for more details. "
+                     "We offer health insurance and flexible hours. " * 5),
+    "contacts": {"emails": ["hr.acme@gmail.com"], "urls": [], "phones": []},
+}
+
+FEE_DEMAND = {
+    "title": "Data Entry Operator",
+    "company": "Quick Jobs Pvt Ltd",
+    "salary": "Rs 30,000/month",
+    "description": ("Work from home data entry. Pay Rs 2000 registration fee to start. "
+                     "Great earning potential. " * 5),
+    "contacts": {"emails": ["careers@quickjobs.com"], "urls": [], "phones": []},
+}
+
+SALARY_MISMATCH = {
+    "title": "Backend Developer",
+    "company": "TechCo Pvt Ltd",
+    "salary": "40-50 Lacs",
+    "description": ("Build scalable APIs. Salary: 2.5 to 4.5 Lakhs per annum. "
+                     "We offer great benefits and learning opportunities. " * 5),
+    "contacts": {"emails": ["careers@techco.com"], "urls": [], "phones": []},
+}
+
+SALARY_CONSISTENT = {
+    "title": "Backend Developer",
+    "company": "TechCo Pvt Ltd",
+    "salary": "INR 8,00,000 - 12,00,000",
+    "description": ("Build scalable APIs. Salary: ₹8,00,000 to ₹12,00,000 per year. "
+                     "We offer great benefits and learning opportunities. " * 5),
+    "contacts": {"emails": ["careers@techco.com"], "urls": [], "phones": []},
+}
+
+
+class SeverityScoring(unittest.TestCase):
+    def test_free_email_capped_at_74_and_caution(self):
+        out = re_.analyze_rules_only(FREE_EMAIL_ONLY)
+        self.assertLessEqual(out["trustScore"], 74)
+        self.assertEqual(out["verdict"], "Apply with caution")
+
+    def test_fee_demand_capped_at_30_and_likely_scam(self):
+        out = re_.analyze_rules_only(FEE_DEMAND)
+        self.assertLessEqual(out["trustScore"], 30)
+        self.assertEqual(out["verdict"], "Likely scam")
+
+    def test_clean_listing_still_looks_ok(self):
+        out = re_.analyze_rules_only(CLEAN)
+        self.assertEqual(out["verdict"], "Looks OK")
+        self.assertGreater(out["trustScore"], 74)
+
+    def test_salary_mismatch_flagged(self):
+        out = re_.analyze_rules(SALARY_MISMATCH)
+        joined = " ".join(out["transparency"]["redFlags"]).lower()
+        self.assertIn("salary figures", joined)
+        self.assertIn("do not match", joined)
+
+    def test_salary_no_mismatch_not_flagged(self):
+        out = re_.analyze_rules(SALARY_CONSISTENT)
+        joined = " ".join(out["transparency"]["redFlags"]).lower()
+        self.assertNotIn("salary figures", joined)
+
+
 if __name__ == "__main__":
     unittest.main()
