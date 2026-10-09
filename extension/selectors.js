@@ -43,6 +43,13 @@ const SITE_SELECTORS = {
       ".styles_job-description__kfqqJ",
       "section[class*='job-desc']",
       ".dang-inner-html"
+    ],
+    experience: [
+      ".styles_jdn-exp__OvL_j span",
+      ".styles_jdn-exp__OvL_j",
+      ".experience",
+      "span[class*='exp']",
+      ".exp"
     ]
   },
   internshala: {
@@ -82,6 +89,10 @@ const SITE_SELECTORS = {
       ".text-container",
       ".job_description",
       ".internship_other_details"
+    ],
+    experience: [
+      ".experience_container",
+      "span[class*='experience']"
     ]
   },
   linkedin: {
@@ -117,6 +128,10 @@ const SITE_SELECTORS = {
       ".show-more-less-html__markup",
       ".description__text",
       "article.jobs-description"
+    ],
+    experience: [
+      ".job-details-jobs-unified-top-card__job-insight span",
+      "span[class*='experience']"
     ]
   },
   generic: {
@@ -156,6 +171,12 @@ const SITE_SELECTORS = {
       "main article",
       "article",
       ".description"
+    ],
+    experience: [
+      "[data-testid*='experience']",
+      ".experience",
+      "[class*='experience']",
+      "[class*='exp']"
     ]
   }
 };
@@ -303,11 +324,23 @@ function extractJobListing() {
   const description = descRes.text || "";
   const contacts = extractContacts(description);
 
+  // 6. Extract Experience
+  let expRes = queryFirstText(config.experience || []);
+  if (!expRes.text) expRes = queryFirstText(genericConfig.experience || []);
+  // Fallback: extract experience from description text
+  if (!expRes.text && description) {
+    const expMatch = description.match(/(\d+)\s*(?:\+|\-\s*\d+)?\s*(?:years?|yrs?)\s*(?:of\s+)?(?:experience|exp)/i);
+    if (expMatch) {
+      expRes = { text: expMatch[0].trim(), matchedSelector: "description-regex" };
+    }
+  }
+
   return {
     title: titleRes.text || "Untitled Position",
     company: companyRes.text || "Unknown Company",
     location: locRes.text || "Not specified",
     salary: salRes.text || "Not disclosed",
+    experience: expRes.text || "",
     description: description,
     url: window.location.href,
     contacts: contacts,
@@ -321,6 +354,7 @@ function extractJobListing() {
         company: companyRes.matchedSelector,
         location: locRes.matchedSelector,
         salary: salRes.matchedSelector,
+        experience: expRes.matchedSelector,
         description: descRes.matchedSelector
       },
       usedFallbackDesc

@@ -12,14 +12,25 @@
 
 ---
 
-## 📸 In Action: Real-World Example on Internshala
+## 📸 In Action: Real-World Example on Naukri
 
-Below is FairHire running live on an actual Internshala internship listing, demonstrating automatic page reading followed by an in-depth trust and safety audit:
+Below is FairHire running live on an actual **Naukri** job listing (*Infosys - IBM Filenet Developer*), showing the minimal, card-based UI for instant DOM extraction and comprehensive Trust & Safety audit:
+
+| 1. Auto-Detection & Extraction Card | 2. Real-Time Trust & Safety Report |
+| :---: | :---: |
+| ![FairHire Auto-Detection on Naukri](docs/screenshots/naukri_job_detected.png) | ![FairHire Trust Score & Breakdown on Naukri](docs/screenshots/naukri_trust_analysis.png) |
+| *FairHire reads DOM selectors, extracts job title, company ratings, location, salary status, and previews scam/bias criteria.* | *Instant composite score (96/100), dimensional breakdown (Scam Risk 0/100, Inclusivity 100/100, Pay Clarity 85/100), and key signals.* |
+
+<details>
+<summary><b>🔍 View Example on Internshala (Previous Prototype)</b></summary>
+<br/>
 
 | 1. Auto-Detection & Extraction | 2. Real-Time Trust & Safety Report |
 | :---: | :---: |
 | ![FairHire Auto-Detection on Internshala](docs/screenshots/internshala_job_detected.png) | ![FairHire Trust Score & Breakdown](docs/screenshots/internshala_trust_analysis.png) |
 | *FairHire identifies portal selectors, extracts job title, company, stipend, duration, and full description.* | *Instant composite score (88/100), dimensional breakdown, scam risk audit, and disclosed benefits.* |
+
+</details>
 
 ---
 
@@ -141,8 +152,10 @@ FairHire/
 └── docs/
     ├── SCORING.md                 # Detailed scoring formula, weights & mathematical model
     └── screenshots/               # High-resolution screenshots of the extension in action
-        ├── internshala_job_detected.png
-        └── internshala_trust_analysis.png
+        ├── naukri_job_detected.png       # Minimal UI: Pre-check DOM extraction
+        ├── naukri_trust_analysis.png     # Minimal UI: 96/100 Trust Score audit
+        ├── internshala_job_detected.png  # Previous prototype: Internshala extraction
+        └── internshala_trust_analysis.png # Previous prototype: Internshala audit
 ```
 
 ---

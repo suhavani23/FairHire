@@ -309,7 +309,7 @@
   }
 
   /**
-   * Renders the extracted data inside the panel
+   * Renders the job summary card with "Check trust" CTA
    */
   function renderExtractionCard(data) {
     showView("extract");
@@ -322,6 +322,11 @@
       .toUpperCase();
 
     const isSalaryDisclosed = data.meta && data.meta.hasSalary;
+    const salaryText = isSalaryDisclosed ? escapeHtml(data.salary) : "Salary not disclosed";
+    const salaryClass = isSalaryDisclosed ? "" : "salary-missing";
+    const experienceText = data.experience ? escapeHtml(data.experience) : "Not specified";
+
+    // Build contact and description HTML for the debug section
     const emailsCount = data.contacts.emails.length;
     const urlsCount = data.contacts.urls.length;
     const phonesCount = data.contacts.phones.length;
@@ -334,7 +339,7 @@
         return `
           <div class="fh-contact-item">
             <span>✉️ ${escapeHtml(email)}</span>
-            <span class="fh-contact-tag" style="background:${isFree ? 'var(--fh-pink)' : 'var(--fh-green)'}">
+            <span class="fh-contact-tag" style="background:${isFree ? '#FEE2E2; color:#DC2626' : 'var(--fh-tint-1); color:var(--fh-primary)'}">
               ${isFree ? 'Free Webmail' : 'Corporate'}
             </span>
           </div>
@@ -348,87 +353,106 @@
     if (urlsCount > 0) {
       urlsHtml = data.contacts.urls.slice(0, 3).map(url => {
         const cleanUrl = url.length > 34 ? url.substring(0, 34) + "..." : url;
-        return `
-          <div class="fh-contact-item">
-            <span>🔗 ${escapeHtml(cleanUrl)}</span>
-            <span class="fh-contact-tag">Link</span>
-          </div>
-        `;
+        return `<div class="fh-contact-item"><span>🔗 ${escapeHtml(cleanUrl)}</span><span class="fh-contact-tag">Link</span></div>`;
       }).join("");
     }
 
     let phonesHtml = "";
     if (phonesCount > 0) {
-      phonesHtml = data.contacts.phones.map(phone => `
-        <div class="fh-contact-item">
-          <span>📞 ${escapeHtml(phone)}</span>
-          <span class="fh-contact-tag">Phone</span>
-        </div>
-      `).join("");
+      phonesHtml = data.contacts.phones.map(phone =>
+        `<div class="fh-contact-item"><span>📞 ${escapeHtml(phone)}</span><span class="fh-contact-tag">Phone</span></div>`
+      ).join("");
     }
 
     extractView.innerHTML = `
-      <div class="fh-card">
-        <div class="fh-extract-header">
-          <span class="fh-telemetry-badge">${escapeHtml(data.meta.portal.toUpperCase())} DETECTED</span>
-          <span style="font-size:11px; font-weight:700; color:#444;">${data.meta.wordCount} words</span>
+      <!-- Job Summary Card -->
+      <div class="fh-summary-card">
+        <div class="fh-summary-title">${escapeHtml(data.title)}</div>
+
+        <div class="fh-summary-company-row">
+          <div class="fh-summary-initials">${companyInitials}</div>
+          <div class="fh-summary-company-info">
+            <div class="fh-summary-company-name">${escapeHtml(data.company)}</div>
+            <div class="fh-summary-rating">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>Rating unavailable</span>
+            </div>
+          </div>
         </div>
 
-        <h1 class="fh-job-title">${escapeHtml(data.title)}</h1>
-
-        <div class="fh-company-row">
-          <div class="fh-company-avatar">${companyInitials}</div>
-          <div class="fh-company-name">${escapeHtml(data.company)}</div>
+        <div class="fh-summary-chips">
+          <span class="fh-summary-chip"><span class="chip-icon">📍</span> ${escapeHtml(data.location)}</span>
+          <span class="fh-summary-chip"><span class="chip-icon">💼</span> ${experienceText}</span>
+          <span class="fh-summary-chip ${salaryClass}"><span class="chip-icon">💰</span> ${salaryText}</span>
         </div>
 
-        <div class="fh-meta-chips">
-          <span class="fh-chip location-chip">
-            📍 ${escapeHtml(data.location)}
-          </span>
-          <span class="fh-chip ${isSalaryDisclosed ? 'salary-ok' : 'salary-missing'}">
-            💰 ${escapeHtml(data.salary)}
-          </span>
-        </div>
-
-        <!-- Run Analysis CTA Button -->
-        <button class="fh-action-btn" id="fh-btn-trigger-analyze" style="margin: 6px 0 14px 0;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <button class="fh-cta-pill" id="fh-btn-trigger-analyze">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <path d="m9 12 2 2 4-4"/>
           </svg>
-          <span>Run Trust & Safety Check</span>
+          <span>Check trust</span>
         </button>
+      </div>
 
-        <!-- Contact Signals -->
-        <div class="fh-section-title">
-          <span>Contact Signals Detected</span>
-          <span style="font-size:10px; color:#666;">${emailsCount + urlsCount + phonesCount} found</span>
+      <!-- What We Check -->
+      <div class="fh-check-list">
+        <div class="fh-check-row">
+          <div class="fh-check-icon icon-scam">🛡️</div>
+          <div class="fh-check-text">
+            <div class="fh-check-title">Scam signals</div>
+            <div class="fh-check-desc">Fee demands, fake contacts, urgency traps, and suspicious domains</div>
+          </div>
         </div>
-        <div class="fh-contact-list">
-          ${emailsHtml}
-          ${urlsHtml}
-          ${phonesHtml}
+        <div class="fh-check-row">
+          <div class="fh-check-icon icon-inclusive">⚖️</div>
+          <div class="fh-check-text">
+            <div class="fh-check-title">Inclusive wording</div>
+            <div class="fh-check-desc">Gendered language, age bias, and unreasonable availability expectations</div>
+          </div>
         </div>
-
-        <!-- Description Snippet -->
-        <div class="fh-section-title">
-          <span>Extracted Description</span>
-          <span style="font-size:10px; color:#666;">${data.meta.charCount} chars</span>
-        </div>
-        <div class="fh-desc-preview">${escapeHtml(data.description.substring(0, 360))}${data.description.length > 360 ? '...' : ''}</div>
-
-        <div style="display:flex; gap:8px; margin-top:10px;">
-          <button class="fh-btn-secondary" id="fh-btn-rescan" style="flex:1;">
-            🔄 Re-scan Page
-          </button>
-          <button class="fh-btn-secondary" id="fh-btn-copy-json" style="flex:1;">
-            📋 Copy Extracted JSON
-          </button>
+        <div class="fh-check-row">
+          <div class="fh-check-icon icon-pay">💰</div>
+          <div class="fh-check-text">
+            <div class="fh-check-title">Pay and role clarity</div>
+            <div class="fh-check-desc">Salary transparency, vague duties, inflated requirements, and missing benefits</div>
+          </div>
         </div>
       </div>
+
+      <!-- Debug Section (collapsed) -->
+      <details class="fh-debug-details">
+        <summary>Debug · extraction data</summary>
+        <div class="fh-debug-body">
+          <div class="fh-section-title">
+            <span>Contact Signals</span>
+            <span style="font-size:10px; color:#666;"> · ${emailsCount + urlsCount + phonesCount} found</span>
+          </div>
+          <div class="fh-contact-list">
+            ${emailsHtml}
+            ${urlsHtml}
+            ${phonesHtml}
+          </div>
+
+          <div class="fh-section-title" style="margin-top:12px;">
+            <span>Extracted Description</span>
+            <span style="font-size:10px; color:#666;"> · ${data.meta.charCount} chars</span>
+          </div>
+          <div class="fh-desc-preview">${escapeHtml(data.description.substring(0, 360))}${data.description.length > 360 ? '...' : ''}</div>
+
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="fh-btn-secondary" id="fh-btn-rescan" style="flex:1;">
+              🔄 Re-scan Page
+            </button>
+            <button class="fh-btn-secondary" id="fh-btn-copy-json" style="flex:1;">
+              📋 Copy Extracted JSON
+            </button>
+          </div>
+        </div>
+      </details>
     `;
 
-    // Wire up CTA buttons
+    // Wire up buttons
     const analyzeBtn = shadow.getElementById("fh-btn-trigger-analyze");
     const rescanBtn = shadow.getElementById("fh-btn-rescan");
     const copyJsonBtn = shadow.getElementById("fh-btn-copy-json");

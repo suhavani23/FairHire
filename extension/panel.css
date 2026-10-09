@@ -209,3 +209,92 @@
 .fh-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--fh-risk-green); }
 .fh-status-dot.offline { background: var(--fh-risk-red); }
 .fh-mode-badge { background: var(--fh-primary); color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+
+/* ── Job Summary Card ─────────────────────────────── */
+.fh-summary-card {
+  background: var(--fh-tint-2); border: 1px solid var(--fh-border-light);
+  border-radius: var(--fh-radius); padding: 16px;
+}
+.fh-summary-title {
+  font-size: 17px; font-weight: 600; color: var(--fh-text); margin-bottom: 10px; line-height: 1.3;
+}
+.fh-summary-company-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.fh-summary-initials {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--fh-primary);
+  color: #fff; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.fh-summary-company-info { display: flex; flex-direction: column; gap: 1px; }
+.fh-summary-company-name { font-size: 14px; font-weight: 600; color: var(--fh-text); }
+.fh-summary-rating {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--fh-secondary);
+}
+.fh-summary-rating svg { width: 12px; height: 12px; fill: var(--fh-risk-amber); }
+.fh-summary-chips {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+}
+.fh-summary-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 10px; font-size: 12px; font-weight: 500; border-radius: 6px;
+  background: #fff; border: 1px solid var(--fh-border-light); color: var(--fh-secondary);
+}
+.fh-summary-chip .chip-icon { font-size: 13px; }
+.fh-summary-chip.salary-missing {
+  background: #FFFBEA; border-color: #F59E0B; color: #92400E;
+}
+
+/* Primary CTA pill */
+.fh-cta-pill {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 11px 16px; border: none; border-radius: var(--fh-pill-radius);
+  background: var(--fh-primary); color: #fff;
+  font-family: var(--fh-font); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+}
+.fh-cta-pill:hover { opacity: 0.92; }
+.fh-cta-pill:active { transform: scale(0.98); }
+.fh-cta-pill svg { flex-shrink: 0; }
+
+/* ── What We Check ──────────────────────────────── */
+.fh-check-list {
+  display: flex; flex-direction: column; gap: 0;
+  margin-top: 16px;
+}
+.fh-check-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--fh-border-light);
+}
+.fh-check-row:last-child { border-bottom: none; }
+.fh-check-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.fh-check-icon.icon-scam { background: #FEE2E2; }
+.fh-check-icon.icon-inclusive { background: #EDE9FE; }
+.fh-check-icon.icon-pay { background: #DBEAFE; }
+.fh-check-text { flex: 1; }
+.fh-check-title { font-size: 13px; font-weight: 600; color: var(--fh-text); }
+.fh-check-desc { font-size: 11px; color: var(--fh-secondary); line-height: 1.4; margin-top: 1px; }
+
+/* ── Debug Details (collapsible) ──────────────────── */
+.fh-debug-details {
+  display: none;
+  margin-top: 12px; border: 1px solid var(--fh-border-light); border-radius: var(--fh-radius);
+  overflow: hidden;
+}
+.fh-debug-area.show ~ .fh-panel-body .fh-debug-details {
+  display: block;
+}
+.fh-debug-details summary {
+  padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--fh-secondary);
+  cursor: pointer; background: var(--fh-tint-2); text-transform: uppercase; letter-spacing: 0.3px;
+  list-style: none; display: flex; align-items: center; gap: 6px;
+}
+.fh-debug-details summary::before { content: "▸"; font-size: 10px; }
+.fh-debug-details[open] summary::before { content: "▾"; }
+.fh-debug-details summary::-webkit-details-marker { display: none; }
+.fh-debug-details .fh-debug-body { padding: 12px; font-size: 12px; }
+

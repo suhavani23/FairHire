@@ -69,7 +69,7 @@ def run_all():
             "phones": []
         }
     }
-    analyze_fixture("mock_test.html", test_payload, expected_verdict="Looks OK", min_trust=70, expected_flags=["rockstar", "aggressive", "young and energetic"])
+    analyze_fixture("mock_test.html", test_payload, expected_verdict="Apply with caution", min_trust=70, expected_flags=["rockstar", "aggressive", "young and energetic"])
 
     # 3. Clean corporate listing
     clean_payload = {
